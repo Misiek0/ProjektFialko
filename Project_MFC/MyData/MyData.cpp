@@ -352,14 +352,3 @@ void MY_DATA::GetMaxMinCoords(double& max_x, double& min_x, double& max_y, doubl
         }
     }
 }
-
-MY_POINT::~MY_POINT()
-{
-    if (name) {
-        delete[] name;
-    }
-}
-
-MY_COORD::~MY_COORD()
-{
-}

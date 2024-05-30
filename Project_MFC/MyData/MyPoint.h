@@ -17,8 +17,8 @@ public:
 	int numb;
 	COLORREF color;
 public:
-	MY_POINT() : x(0), y(0) {}
-	MY_POINT(double xx, double yy) : x(xx), y(yy) {}
+	MY_POINT() : x(0), y(0), name(nullptr) {}
+	MY_POINT(double xx, double yy, COLORREF color) : x(xx), y(yy), name(nullptr), color(color){}
 	~MY_POINT();
 	void set(double xx, double yy) { x = xx; y = yy; }
 	MY_POINT get() { return *this; }
