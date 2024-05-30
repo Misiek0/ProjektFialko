@@ -9,8 +9,10 @@
 
 #ifdef MYDATA_EXPORTS
 #define MYDATA_API __declspec(dllexport)
+#define PROJECT_MFC_API __declspec(dllexport)
 #else
 #define MYDATA_API __declspec(dllimport)
+#define PROJECT_MFC_API __declspec(dllimport)
 #endif
 
 #include "resource.h"		// main symbols
@@ -35,15 +37,31 @@ public:
 
 #pragma pack(push, 1)
 
-class MYDATA_API MY_POINT
+class PROJECT_MFC_API MY_COORD {
+protected:
+	double x;
+	double y;
+
+public:
+	MY_COORD(double xCoord, double yCoord) : x(xCoord), y(yCoord) {}
+
+	MY_COORD() : x(0), y(0) {}
+
+	virtual ~MY_COORD();
+};
+
+class MYDATA_API MY_POINT : public MY_COORD
 {
 public:
 	double x;
 	double y;
+	char* name;
+	int numb;
+	COLORREF color;
 public:
 	MY_POINT() : x(0), y(0) {}
 	MY_POINT(double xx, double yy) : x(xx), y(yy) {}
-	~MY_POINT() {}
+	~MY_POINT();
 	void set(double xx, double yy) { x = xx; y = yy; }
 	MY_POINT get() { return *this; }
 };
@@ -55,6 +73,7 @@ protected:
 	int capacity;
 	int last;
 public:
+	MY_POINT* myPointArray = new MY_POINT[capacity];
 	MY_DATA(int no_it);
 	MY_DATA(const MY_DATA& ob);
 	~MY_DATA() { Free(); }
