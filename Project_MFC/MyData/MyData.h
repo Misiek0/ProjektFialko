@@ -16,7 +16,7 @@
 #endif
 
 #include "resource.h"		// main symbols
-
+#include <string>
 
 // CMyDataApp
 // See MyData.cpp for the implementation of this class
@@ -73,7 +73,6 @@ protected:
 	int capacity;
 	int last;
 public:
-	MY_POINT* myPointArray = new MY_POINT[capacity];
 	MY_DATA(int no_it);
 	MY_DATA(const MY_DATA& ob);
 	~MY_DATA() { Free(); }
@@ -82,10 +81,36 @@ public:
 	void Push(const MY_POINT& tmp);
 	int size() { return last; }
 	void clear() { last = 0; }
+	void clear_all();
+	void saveToFile(const char* filename);
+	MY_POINT* loadFromFile(const char* filename, size_t& size);
+	bool OpenFileDialog(char* filename, DWORD nMaxFile);
+	bool SaveFileDialog(char* filename, DWORD nMaxFile);
+
+	//generated point 4/5
+	void addObject();
+	void getLastObject();
+	void removeObject();
+	void removeAllObjects();
+	void modifyObject(int index);
+	void findObjectsByNumber(int number);
+	void displayData();
+	void exportToCSV(const std::string& filename);
+	void quitApplication();
 
 	MY_POINT& operator [] (const int i)
 	{
 		return pTab[i];
+	}
+
+	template <class T, class Key>
+	T* find(const T* p_begin, const T* p_end, const Key& k) {
+		for (const T* p = p_begin; p != p_end; ++p) {
+			if (strcmp(p->name, k) == 0) {
+				return const_cast<T*>(p);
+			}
+		}
+		return nullptr;
 	}
 
 	void GetMaxMinCoords(double& max_x, double& min_x, double& max_y, double& min_y);
