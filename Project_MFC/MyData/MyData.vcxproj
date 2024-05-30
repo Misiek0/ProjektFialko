@@ -201,7 +201,9 @@ copy $(TargetPath) ..\..\Exe64\$(TargetName).dll</Command>
     </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="MyCoord.cpp" />
     <ClCompile Include="MyData.cpp" />
+    <ClCompile Include="MyPoint.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -215,7 +217,9 @@ copy $(TargetPath) ..\..\Exe64\$(TargetName).dll</Command>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h" />
+    <ClInclude Include="MyCoord.h" />
     <ClInclude Include="MyData.h" />
+    <ClInclude Include="MyPoint.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="targetver.h" />

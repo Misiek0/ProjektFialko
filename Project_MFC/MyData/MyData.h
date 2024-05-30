@@ -3,6 +3,9 @@
 
 #pragma once
 
+#include "MyPoint.h"
+
+
 #ifndef __AFXWIN_H__
 	#error "include 'pch.h' before including this file for PCH"
 #endif
@@ -36,35 +39,6 @@ public:
 
 
 #pragma pack(push, 1)
-
-class PROJECT_MFC_API MY_COORD {
-protected:
-	double x;
-	double y;
-
-public:
-	MY_COORD(double xCoord, double yCoord) : x(xCoord), y(yCoord) {}
-
-	MY_COORD() : x(0), y(0) {}
-
-	virtual ~MY_COORD();
-};
-
-class MYDATA_API MY_POINT : public MY_COORD
-{
-public:
-	double x;
-	double y;
-	char* name;
-	int numb;
-	COLORREF color;
-public:
-	MY_POINT() : x(0), y(0) {}
-	MY_POINT(double xx, double yy) : x(xx), y(yy) {}
-	~MY_POINT();
-	void set(double xx, double yy) { x = xx; y = yy; }
-	MY_POINT get() { return *this; }
-};
 
 class MYDATA_API MY_DATA : public MY_POINT
 {
