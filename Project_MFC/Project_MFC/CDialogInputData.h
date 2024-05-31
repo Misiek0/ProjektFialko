@@ -63,4 +63,7 @@ public:
     afx_msg void OnItemchangingListCtrl(NMHDR* pNMHDR, LRESULT* pResult);
     afx_msg void OnBnClickedOk();
     afx_msg void OnClickedButtonColor();
+
+    afx_msg void OnClickedButtonSaveBinary();
+    afx_msg void OnClickedButtonLoadBinary();
 };

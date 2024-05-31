@@ -36,6 +36,8 @@ CDialogInputData::CDialogInputData(CProjectMFCDoc* pDoc, CWnd* pParent /*=nullpt
     memset(&lvi, 0, sizeof(LVITEMA));
 }
 
+
+
 CDialogInputData::~CDialogInputData()
 {
     m_smallImageList.DeleteImageList();
@@ -56,6 +58,8 @@ BEGIN_MESSAGE_MAP(CDialogInputData, CDialogEx)
     ON_NOTIFY(LVN_ITEMCHANGING, IDC_LIST_CTRL, &CDialogInputData::OnItemchangingListCtrl)
     ON_BN_CLICKED(IDOK, &CDialogInputData::OnBnClickedOk)
     ON_BN_CLICKED(IDC_BUTTON_COLOR, &CDialogInputData::OnClickedButtonColor)
+    ON_BN_CLICKED(IDC_BUTTON_SAVE_BINARY, &CDialogInputData::OnClickedButtonSaveBinary)
+    ON_BN_CLICKED(IDC_BUTTON_LOAD_BINARY, &CDialogInputData::OnClickedButtonLoadBinary)
 END_MESSAGE_MAP()
 
 BOOL CDialogInputData::OnInitDialog()
@@ -232,6 +236,16 @@ void CDialogInputData::OnClickedButtonColor()
         m_ColorBox.SetColor(m_Color);
         m_ColorBox.Invalidate();
     }
+}
+
+void CDialogInputData::OnClickedButtonSaveBinary()
+{
+    //pDat->saveToFile("testFile.bin");
+}
+
+void CDialogInputData::OnClickedButtonLoadBinary()
+{
+    //pDat->loadFromFile("testFile.bin", 2);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

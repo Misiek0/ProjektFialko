@@ -85,6 +85,7 @@
 #define IDS_EXPLORER                    305
 #define IDS_EDIT_MENU                   306
 #define IDD_DIALOG_INPUT_DATA           310
+#define IDD_DIALOG_FILES                311
 #define IDC_LIST_CTRL                   1000
 #define IDC_EDIT_X                      1001
 #define IDS_STRING101                   1001
@@ -96,7 +97,11 @@
 #define IDC_BUTTON1                     1006
 #define IDC_BUTTON_COLOR                1006
 #define IDC_STATIC_COLOR                1007
+#define IDC_BUTTON_SAVE_BINARY          1008
+#define IDC_BUTTON_LOAD_BINARY          1009
 #define ID_OPERATE_INPUTDATA            32771
+#define ID_OPERATE_SAVE_TO_BINARY		32772
+#define ID_OPERATE_LOAD_FROM_BINARY     32773
 
 // Next default values for new objects
 // 

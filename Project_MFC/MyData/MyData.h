@@ -4,7 +4,7 @@
 #pragma once
 
 #include "MyPoint.h"
-
+#include <string.h>
 
 #ifndef __AFXWIN_H__
 	#error "include 'pch.h' before including this file for PCH"
@@ -57,12 +57,12 @@ public:
 	void clear() { last = 0; }
 	void clear_all();
 	void saveToFile(const char* filename);
-	MY_POINT* loadFromFile(const char* filename, size_t& size);
-	bool OpenFileDialog(char* filename, DWORD nMaxFile);
+	bool loadFromFile(const char* filename);
+	std::string OpenFileDialog();
 	bool SaveFileDialog(char* filename, DWORD nMaxFile);
 
 	//generated point 4/5
-	void addObject();
+	void addObject(const MY_POINT& newPoint);
 	void getLastObject();
 	void removeObject();
 	void removeAllObjects();

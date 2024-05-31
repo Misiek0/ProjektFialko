@@ -32,6 +32,8 @@ BEGIN_MESSAGE_MAP(CProjectMFCView, CView)
 	ON_WM_CONTEXTMENU()
 	ON_WM_RBUTTONUP()
 	ON_COMMAND(ID_OPERATE_INPUTDATA, &CProjectMFCView::OnOperateInputdata)
+	ON_COMMAND(ID_OPERATE_SAVE_TO_BINARY, &CProjectMFCView::OnOperateSaveToBinary)
+	ON_COMMAND(ID_OPERATE_LOAD_FROM_BINARY, &CProjectMFCView::OnOperateLoadFromBinary)
 END_MESSAGE_MAP()
 
 // CProjectMFCView construction/destruction
@@ -265,5 +267,32 @@ void CProjectMFCView::OnOperateInputdata()
 	dlg.DoModal();
 }
 
+void CProjectMFCView::OnOperateSaveToBinary()
+{
+	CProjectMFCDoc* pDoc = GetDocument();
 
+	pDoc->pDat->saveToFile("myPoints.bin");
+}
+
+void CProjectMFCView::OnOperateLoadFromBinary()
+{
+	UpdateData(TRUE);
+	CProjectMFCDoc* pDoc = GetDocument();
+	if (pDoc && pDoc->pDat)
+	{
+		std::string filename = pDoc->pDat->OpenFileDialog();
+		if (!filename.empty())
+		{
+			pDoc->pDat->loadFromFile(filename.c_str());
+		}
+	}
+
+	//pDC->Ellipse(point.x - 2, point.y - 2, point.x + 2, point.y + 2);
+	//Invalidate(); // Invalidate the view to trigger a redraw
+	//UpdateWindow();
+
+	UpdateData(FALSE);
+	pDoc->SetModifiedFlag();
+	pDoc->UpdateAllViews(NULL);
+}
 

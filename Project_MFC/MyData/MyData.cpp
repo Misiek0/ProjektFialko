@@ -138,76 +138,89 @@ void MY_DATA::clear_all()
 
 void MY_DATA::saveToFile(const char* filename)
 {
-    ofstream outFile(filename, std::ios::binary);
-    if (outFile.is_open()) {
-        outFile.write(reinterpret_cast<const char*>(MY_DATA::size()), sizeof(MY_DATA::size()));
-        for (size_t i = 0; i < MY_DATA::size(); ++i) {
-            double x = pTab[i].x;
-            double y = pTab[i].y;
-            outFile.write(reinterpret_cast<const char*>(&x), sizeof(x));
-            outFile.write(reinterpret_cast<const char*>(&y), sizeof(y));
-
-            size_t name_length = pTab[i].name ? strlen(pTab[i].name) : 0;
-            outFile.write(reinterpret_cast<const char*>(&name_length), sizeof(name_length));
-            if (name_length > 0) {
-                outFile.write(pTab[i].name, name_length);
-            }
-
-            outFile.write(reinterpret_cast<const char*>(&pTab[i].numb), sizeof(pTab[i].numb));
-            outFile.write(reinterpret_cast<const char*>(&pTab[i].color), sizeof(pTab[i].color));
-        }
-        outFile.close();
+    std::ofstream outFile(filename, std::ios::binary);
+    if (!outFile)
+    {
+        std::cerr << "Error opening file for writing: " << filename << std::endl;
+        return;
     }
+
+    outFile.write(reinterpret_cast<const char*>(&capacity), sizeof(capacity));
+
+    for (size_t i = 0; i < capacity; ++i)
+    {   
+        outFile.write(reinterpret_cast<const char*>(&pTab[i].x), sizeof(pTab[i].x));
+        outFile.write(reinterpret_cast<const char*>(&pTab[i].y), sizeof(pTab[i].y));
+        outFile.write(reinterpret_cast<const char*>(&pTab[i].numb), sizeof(pTab[i].numb));
+        outFile.write(reinterpret_cast<const char*>(&pTab[i].color), sizeof(pTab[i].color));
+
+        size_t nameLength = (pTab[i].name != nullptr) ? strlen(pTab[i].name) : 0;
+        outFile.write(reinterpret_cast<const char*>(&nameLength), sizeof(nameLength));
+        if (nameLength > 0)
+        {
+            outFile.write(pTab[i].name, nameLength);
+        }
+    }
+
+    outFile.close();
 }
 
-MY_POINT* MY_DATA::loadFromFile(const char* filename, size_t& size)
+bool MY_DATA::loadFromFile(const char* filename)
 {
     std::ifstream inFile(filename, std::ios::binary);
-    if (!inFile.is_open()) {
-        std::cerr << "Unable to open file for reading." << std::endl;
-        return nullptr;
+    if (!inFile)
+    {
+        std::cerr << "Error opening file for reading: " << filename << std::endl;
+        return false;
     }
 
-    inFile.read(reinterpret_cast<char*>(&size), sizeof(size));
-    MY_POINT* myPointArray = new MY_POINT[size];
+    inFile.read(reinterpret_cast<char*>(&capacity), sizeof(capacity));
+    //delete[] pTab;
 
-    for (size_t i = 0; i < size; ++i) {
-        inFile.read(reinterpret_cast<char*>(&myPointArray[i].x), sizeof(myPointArray[i].x));
-        inFile.read(reinterpret_cast<char*>(&myPointArray[i].y), sizeof(myPointArray[i].y));
+    MY_POINT myPointObj;
 
-        size_t name_length;
-        inFile.read(reinterpret_cast<char*>(&name_length), sizeof(name_length));
-        if (name_length > 0) {
-            myPointArray[i].name = new char[name_length + 1];
-            inFile.read(myPointArray[i].name, name_length);
-            myPointArray[i].name[name_length] = '\0';
-        }
-        else {
-            myPointArray[i].name = nullptr;
-        }
+    for (size_t i = 0; i < capacity; ++i)
+    {
+        inFile.read(reinterpret_cast<char*>(&myPointObj.x), sizeof(myPointObj.x));
+        inFile.read(reinterpret_cast<char*>(&myPointObj.y), sizeof(myPointObj.y));
+        inFile.read(reinterpret_cast<char*>(&myPointObj.numb), sizeof(myPointObj.numb));
+        inFile.read(reinterpret_cast<char*>(&myPointObj.color), sizeof(myPointObj.color));
 
-        inFile.read(reinterpret_cast<char*>(&myPointArray[i].numb), sizeof(myPointArray[i].numb));
-        inFile.read(reinterpret_cast<char*>(&myPointArray[i].color), sizeof(myPointArray[i].color));
+        size_t nameLength;
+        inFile.read(reinterpret_cast<char*>(&nameLength), sizeof(nameLength));
+        myPointObj.name = new char[nameLength + 1];
+        inFile.read(myPointObj.name, nameLength);
+        myPointObj.name[nameLength] = '\0';
+
+        this->addObject(myPointObj);
     }
 
     inFile.close();
-    return myPointArray;
+    return true;
 }
 
-bool MY_DATA::OpenFileDialog(char* filename, DWORD nMaxFile)
+string MY_DATA::OpenFileDialog()
 {
     OPENFILENAME ofn;
-    ZeroMemory(&filename, sizeof(filename));
+    char szFile[260] = { 0 };
+
     ZeroMemory(&ofn, sizeof(ofn));
     ofn.lStructSize = sizeof(ofn);
-    ofn.hwndOwner = nullptr;
-    ofn.lpstrFilter = "All Files\0*.*\0Binary Files\0*.bin\0";
-    ofn.lpstrFile = filename;
-    ofn.nMaxFile = nMaxFile;
-    ofn.Flags = OFN_DONTADDTORECENT | OFN_FILEMUSTEXIST;
-    ofn.lpstrTitle = "Select a File";
+    ofn.hwndOwner = NULL;
+    ofn.lpstrFile = szFile;
+    ofn.nMaxFile = sizeof(szFile);
+    ofn.lpstrFilter = "Binary Files\0*.bin\0All Files\0*.*\0";
+    ofn.nFilterIndex = 1;
+    ofn.lpstrFileTitle = NULL;
+    ofn.nMaxFileTitle = 0;
+    ofn.lpstrInitialDir = NULL;
+    ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
 
-    return GetOpenFileName(&ofn);
+    if (GetOpenFileName(&ofn) == TRUE)
+    {
+        return std::string(ofn.lpstrFile);
+    }
+    return std::string();
 }
 
 bool MY_DATA::SaveFileDialog(char* filename, DWORD nMaxFile)
@@ -226,10 +239,20 @@ bool MY_DATA::SaveFileDialog(char* filename, DWORD nMaxFile)
     return GetSaveFileName(&ofn);
 }
 
-void MY_DATA::addObject()
-{
-    MY_POINT* newPoint = new MY_POINT();
-    pTab[last] = *newPoint;
+void MY_DATA::addObject(const MY_POINT& newPoint) {
+    if (last >= capacity) {
+        capacity = capacity * 2 + 1;
+        pTab = allocTab(pTab, capacity);
+    }
+    pTab[last] = newPoint;
+
+    if (newPoint.name) {
+        size_t nameLength = strlen(newPoint.name);
+        pTab[last].name = new char[nameLength + 1];
+        strcpy_s(pTab[last].name, sizeof(pTab[last].name), newPoint.name);
+    }
+
+    ++last;
 }
 
 void MY_DATA::getLastObject()
@@ -267,7 +290,7 @@ void MY_DATA::removeAllObjects()
 {
     for (int i = 0; i < last; ++i) {
         delete[] pTab[i].name;  // Free the memory allocated for the name
-        pTab[i].name = nullptr; // Set the name pointer to nullptr
+        pTab[i].name = nullptr; // Set the name pointer to nullptr 
     }
     last = 0;  // Reset the last index
 }

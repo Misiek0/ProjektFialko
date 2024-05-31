@@ -60,6 +60,8 @@ protected:
 	DECLARE_MESSAGE_MAP()
 public:
 	afx_msg void OnOperateInputdata();
+	afx_msg void OnOperateSaveToBinary();
+	afx_msg void OnOperateLoadFromBinary();
 	virtual void OnInitialUpdate();
 };
 

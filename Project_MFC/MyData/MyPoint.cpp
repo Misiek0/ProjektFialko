@@ -7,3 +7,4 @@ MY_POINT::~MY_POINT()
         delete[] name;
     }
 }
+
