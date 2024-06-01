@@ -246,10 +246,20 @@ void MY_DATA::addObject(const MY_POINT& newPoint) {
     }
     pTab[last] = newPoint;
 
+    pTab[last].name = new char[32];
     if (newPoint.name) {
         size_t nameLength = strlen(newPoint.name);
         pTab[last].name = new char[nameLength + 1];
-        strcpy_s(pTab[last].name, sizeof(pTab[last].name), newPoint.name);
+
+        try
+        {
+            //strcpy_s(pTab[last].name, sizeof(pTab[last].name), newPoint.name);
+            strcpy_s(pTab[last].name, nameLength + 1, newPoint.name);
+        }
+        catch (const std::exception&)
+        {
+            int a = 3;
+        }
     }
 
     ++last;

@@ -15,6 +15,7 @@ CDialogInputData::CDialogInputData(CProjectMFCDoc* pDoc, CWnd* pParent /*=nullpt
     , m_X(0)
     , m_Y(0)
     , m_Color(RGB(0, 0, 0))
+    , m_Name(nullptr)
     , pDocum(nullptr) // Initialize pDocum to nullptr
     , pDat(nullptr)   // Initialize pDat to nullptr
 {
@@ -68,7 +69,7 @@ BOOL CDialogInputData::OnInitDialog()
 
     VERIFY(m_ColorBox.SubclassDlgItem(IDC_STATIC_COLOR, this));
 
-    CString strx, stry;
+    CString strx, stry, strColor, strName;
     lvi.mask = LVIF_TEXT;
     lvi.state = 0;
     lvi.stateMask = 0;
@@ -83,11 +84,12 @@ BOOL CDialogInputData::OnInitDialog()
     m_ListCtrl.GetClientRect(&rectListCtrl);
 
     int list_ctrl_width = rectListCtrl.Width();
-    int column_width = list_ctrl_width / 3;
+    int column_width = list_ctrl_width / 4;
 
     m_ListCtrl.InsertColumn(0, "X", LVCFMT_LEFT, column_width, 0);
     m_ListCtrl.InsertColumn(1, "Y", LVCFMT_LEFT, column_width, 1);
     m_ListCtrl.InsertColumn(2, "color", LVCFMT_LEFT, column_width, 2);
+    m_ListCtrl.InsertColumn(3, "name", LVCFMT_LEFT, column_width, 3);
 
     ASSERT(pDat);
     int no_item = pDat->size();
@@ -100,14 +102,15 @@ BOOL CDialogInputData::OnInitDialog()
         lvi.iItem = i;
         strx.Format("%le", pt.x);
         stry.Format("%le", pt.y);
+        strColor.Format("%02X%02X%02X", GetRValue(pt.color), GetGValue(pt.color), GetBValue(pt.color)); // Correct RGB order
+        strName = pt.name;
         lvi.pszText = " ";
-        lvi.cchTextMax = (int)(strx.GetLength() + stry.GetLength());
+        lvi.cchTextMax = (int)(strx.GetLength() + stry.GetLength() + strColor.GetLength());
         m_ListCtrl.InsertItem(&lvi);
         m_ListCtrl.SetItemText(lvi.iItem, 0, strx);
         m_ListCtrl.SetItemText(lvi.iItem, 1, stry);
-        // Optionally, if you want to store the color as text
-        // color.Format("%d", pt.color);
-        // m_ListCtrl.SetItemText(lvi.iItem, 2, color);
+        m_ListCtrl.SetItemText(lvi.iItem, 2, strColor);
+        m_ListCtrl.SetItemText(lvi.iItem, 3, strName);
     }
 
     return TRUE;
@@ -132,15 +135,16 @@ void CDialogInputData::ModifyData()
         double y = atof(st);
         m_ListCtrl.GetItemText(nItem, 2, st, sizeof(st));
 
-        //every value bellow gets 0 instead of the actual color :(
+        // Parse the color from hexadecimal string
+        int r, g, b;
+        sscanf_s(st, "%02X%02X%02X", &r, &g, &b);
+        COLORREF color = RGB(r, g, b);
         
-        //sumarry this is from Fiako
-        COLORREF color = atol(st); // If storing color as text
+        m_ListCtrl.GetItemText(nItem, 3, st, sizeof(st));
+        char* name = new char[strlen(st) + 1];  // Allocate memory for name
+        strcpy_s(name, strlen(st) + 1, st);
 
-        //sumarry this is from Gpt
-        COLORREF color3 = strtoul(st, NULL, 16);
-
-        pDat->Push({ x, y, color });
+        pDat->Push({ x, y, color, name });
     }
 
     UpdateData(FALSE);
@@ -157,18 +161,20 @@ void CDialogInputData::OnBnClickedOk()
 void CDialogInputData::OnClickedButtonAdd()
 {
     UpdateData(TRUE);
-    CString strx, stry, strColor;
+    CString strx, stry, strColor, strName;
     strx.Format("%le", m_X);
     stry.Format("%le", m_Y);
-    // strColor.Format("%d", m_Color); // If storing color as text
+    strColor.Format("%02X%02X%02X", GetRValue(m_Color), GetGValue(m_Color), GetBValue(m_Color)); // If storing color as text
+    strName = m_Name;
 
     lvi.iItem = m_ListCtrl.GetItemCount();
     lvi.pszText = " ";
-    lvi.cchTextMax = (int)(strx.GetLength() + stry.GetLength());
+    lvi.cchTextMax = (int)(strx.GetLength() + stry.GetLength() + strColor.GetLength());
     m_ListCtrl.InsertItem(&lvi);
     m_ListCtrl.SetItemText(lvi.iItem, 0, strx);
     m_ListCtrl.SetItemText(lvi.iItem, 1, stry);
-    // m_ListCtrl.SetItemText(lvi.iItem, 2, strColor); // If storing color as text
+    m_ListCtrl.SetItemText(lvi.iItem, 2, strColor); // If storing color as text
+    m_ListCtrl.SetItemText(lvi.iItem, 3, strName);
 
     UpdateData(FALSE);
     pDocum->SetModifiedFlag();
@@ -181,14 +187,16 @@ void CDialogInputData::OnClickedButtonMod()
         return;
 
     UpdateData(TRUE);
-    CString strx, stry, strColor;
+    CString strx, stry, strColor, strName;
     strx.Format("%le", m_X);
     stry.Format("%le", m_Y);
-    // strColor.Format("%d", m_Color); // If storing color as text
+    strColor.Format("%02X%02X%02X", GetRValue(m_Color), GetGValue(m_Color), GetBValue(m_Color)); // Correct RGB order
+    strName = m_Name;
 
     m_ListCtrl.SetItemText(m_SelItem, 0, strx);
     m_ListCtrl.SetItemText(m_SelItem, 1, stry);
-    // m_ListCtrl.SetItemText(m_SelItem, 2, strColor); // If storing color as text
+    m_ListCtrl.SetItemText(m_SelItem, 2, strColor); // If storing color as text
+    m_ListCtrl.SetItemText(m_SelItem, 3, strName); // If storing color as text
 
     UpdateData(FALSE);
     ModifyData();
@@ -222,6 +230,9 @@ void CDialogInputData::OnItemchangingListCtrl(NMHDR* pNMHDR, LRESULT* pResult)
 
         m_ColorBox.SetItem(m_SelItem);
         m_ColorBox.Invalidate();
+
+        m_ListCtrl.GetItemText(m_SelItem, 3, st, sizeof(st));
+        m_Name = "XD";
 
         UpdateData(FALSE);
     }
@@ -273,7 +284,6 @@ void CColorBox::SetItem(int i)
     COLORREF colors[] = { RGB(0, 0, 0), RGB(255, 0, 0), RGB(0, 255, 0), RGB(0, 0, 255) };
     color = colors[i % _countof(colors)];
 }
-
 
 
 
