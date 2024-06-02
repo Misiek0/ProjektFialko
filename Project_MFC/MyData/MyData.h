@@ -5,6 +5,9 @@
 
 #include "MyPoint.h"
 #include <string.h>
+#include <fstream>
+#include <Windows.h>
+#include <shellapi.h>
 
 #ifndef __AFXWIN_H__
 	#error "include 'pch.h' before including this file for PCH"
@@ -12,15 +15,12 @@
 
 #ifdef MYDATA_EXPORTS
 #define MYDATA_API __declspec(dllexport)
-#define PROJECT_MFC_API __declspec(dllexport)
 #else
 #define MYDATA_API __declspec(dllimport)
-#define PROJECT_MFC_API __declspec(dllimport)
 #endif
 
 #include "resource.h"		// main symbols
 #include <string>
-
 // CMyDataApp
 // See MyData.cpp for the implementation of this class
 //
@@ -39,7 +39,7 @@ public:
 
 
 #pragma pack(push, 1)
-class CExcept1App;
+//class CExcept1App;
 
 class MYDATA_API MY_DATA : public MY_POINT
 {
@@ -47,8 +47,8 @@ protected:
 	MY_POINT* pTab;
 	int capacity;
 	int last;
-public:
-	CExcept1App* pExcept;
+//public:
+//	CExcept1App* pExcept;
 public:
 	MY_DATA(int no_it);
 	MY_DATA(const MY_DATA& ob);
@@ -63,8 +63,9 @@ public:
 	bool loadFromFile(const char* filename);
 	std::string OpenFileDialog();
 	bool SaveFileDialog(char* filename, DWORD nMaxFile);
+	bool exportToCSV(const char* filename);
+	void openCSVInExcel(const char* filename);
 
-	//generated point 4/5
 	void addObject(const MY_POINT& newPoint);
 	void getLastObject();
 	void removeObject();

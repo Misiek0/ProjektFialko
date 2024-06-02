@@ -2,13 +2,11 @@
 
 #ifdef MYDATA_EXPORTS
 #define MYDATA_API __declspec(dllexport)
-#define PROJECT_MFC_API __declspec(dllexport)
 #else
 #define MYDATA_API __declspec(dllimport)
-#define PROJECT_MFC_API __declspec(dllimport)
 #endif
 
-class PROJECT_MFC_API MY_COORD {
+class MYDATA_API MY_COORD {
 protected:
 	double x;
 	double y;

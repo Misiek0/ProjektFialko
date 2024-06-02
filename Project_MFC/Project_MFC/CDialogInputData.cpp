@@ -25,6 +25,7 @@ CDialogInputData::CDialogInputData(CProjectMFCDoc* pDoc, CWnd* pParent /*=nullpt
         return;
     }
 
+    pExcept = GetExceptPtr();
     pDocum = pDoc;
     pDat = pDocum->pDat;
 
@@ -61,6 +62,7 @@ BEGIN_MESSAGE_MAP(CDialogInputData, CDialogEx)
     ON_NOTIFY(LVN_ITEMCHANGING, IDC_LIST_CTRL, &CDialogInputData::OnItemchangingListCtrl)
     ON_BN_CLICKED(IDOK, &CDialogInputData::OnBnClickedOk)
     ON_BN_CLICKED(IDC_BUTTON_COLOR, &CDialogInputData::OnClickedButtonColor)
+    ON_BN_CLICKED(IDC_BUTTON_EXCEL, &CDialogInputData::OnClickedButtonExcel)
     ON_BN_CLICKED(IDC_BUTTON_SAVE_BINARY, &CDialogInputData::OnClickedButtonSaveBinary)
     ON_BN_CLICKED(IDC_BUTTON_LOAD_BINARY, &CDialogInputData::OnClickedButtonLoadBinary)
 END_MESSAGE_MAP()
@@ -120,39 +122,64 @@ BOOL CDialogInputData::OnInitDialog()
 
 void CDialogInputData::ModifyData()
 {
-    char st[512];
-    UpdateData(TRUE);
-    const int no_it = m_ListCtrl.GetItemCount();
+    try {
+        throw std::runtime_error("");//testowe wyrzucenie b³êdu
+        char st[512];
+        UpdateData(TRUE);
+        const int no_it = m_ListCtrl.GetItemCount();
 
-    if (pDat)
-        delete pDat;
-    pDat = new MY_DATA(no_it);
-    pDocum->pDat = pDat;
+        if (pDat)
+            delete pDat;
+        pDat = new MY_DATA(no_it);
+        pDocum->pDat = pDat;
 
-    for (int nItem = 0; nItem < no_it; ++nItem)
-    {
-        m_ListCtrl.GetItemText(nItem, 0, st, sizeof(st));
-        double x = atof(st);
-        m_ListCtrl.GetItemText(nItem, 1, st, sizeof(st));
-        double y = atof(st);
-        m_ListCtrl.GetItemText(nItem, 2, st, sizeof(st));
+        for (int nItem = 0; nItem < no_it; ++nItem)
+        {
+            m_ListCtrl.GetItemText(nItem, 0, st, sizeof(st));
+            double x = atof(st);
+            m_ListCtrl.GetItemText(nItem, 1, st, sizeof(st));
+            double y = atof(st);
+            m_ListCtrl.GetItemText(nItem, 2, st, sizeof(st));
 
-        // Parse the color from hexadecimal string
-        int r, g, b;
-        sscanf_s(st, "%02X%02X%02X", &r, &g, &b);
-        COLORREF color = RGB(r, g, b);
+            // Parse the color from hexadecimal string
+            int r, g, b;
+            sscanf_s(st, "%02X%02X%02X", &r, &g, &b);
+            COLORREF color = RGB(r, g, b);
         
-        m_ListCtrl.GetItemText(nItem, 3, st, sizeof(st));
-        char* name = new char[strlen(st) + 1];  // Allocate memory for name
-        strcpy_s(name, strlen(st) + 1, st);
+            m_ListCtrl.GetItemText(nItem, 3, st, sizeof(st));
+            char* name = new char[strlen(st) + 1];  // Allocate memory for name
+            strcpy_s(name, strlen(st) + 1, st);
 
-        pDat->Push({ x, y, color, name });
+            pDat->Push({ x, y, color, name });
+        }
+
+        UpdateData(FALSE);
+        pDocum->SetModifiedFlag();
+        pDocum->UpdateAllViews(NULL);
     }
+    catch (const std::exception& ex) {
+        //if (pExcept) {
+        //    pExcept->PutMessage((UINT)ex.what());
+        //}
 
-    UpdateData(FALSE);
-    pDocum->SetModifiedFlag();
-    pDocum->UpdateAllViews(NULL);
+        //UINT idMessage = MapExceptionToResourceID(ex);
+        //if (idMessage != 0) {
+            pExcept->PutMessage(1);
+        //}
+        //else {
+        //    CString errorMessage(ex.what());
+        //    AfxMessageBox(errorMessage);
+        //}
+    }
 }
+
+//UINT MapExceptionToResourceID(const std::exception& ex) {
+//    if (strcmp(ex.what(), "Test exception") == 0) {
+//        return IDS_EXCEPTION_TEST;
+//    }
+//    return 0;
+//}
+
 
 void CDialogInputData::OnBnClickedOk()
 {
@@ -211,6 +238,7 @@ void CDialogInputData::OnClickedButtonDel()
 
     m_ListCtrl.DeleteItem(m_SelItem);
     UpdateData(FALSE);
+    pDocum->pDat->removeObject();
     pDocum->SetModifiedFlag();
     pDocum->UpdateAllViews(NULL);
 }
@@ -249,6 +277,12 @@ void CDialogInputData::OnClickedButtonColor()
         m_ColorBox.SetColor(m_Color);
         m_ColorBox.Invalidate();
     }
+}
+
+void CDialogInputData::OnClickedButtonExcel()
+{
+    pDocum->pDat->exportToCSV("data.csv");
+    pDocum->pDat->openCSVInExcel("data.csv");
 }
 
 void CDialogInputData::OnClickedButtonSaveBinary()

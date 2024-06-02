@@ -1,6 +1,7 @@
 #pragma once
 #include "Project_MFCDoc.h"
 #include "MyData.h"
+#include "Except1.h"
 
 class CColorBox : public CStatic
 {
@@ -43,6 +44,8 @@ protected:
 
     DECLARE_MESSAGE_MAP()
 public:
+	CExcept1App* pExcept;
+public:
     CListCtrl m_ListCtrl;
     LV_ITEM lvi;
     CImageList m_smallImageList;
@@ -64,6 +67,7 @@ public:
     afx_msg void OnItemchangingListCtrl(NMHDR* pNMHDR, LRESULT* pResult);
     afx_msg void OnBnClickedOk();
     afx_msg void OnClickedButtonColor();
+    afx_msg void OnClickedButtonExcel();
 
     afx_msg void OnClickedButtonSaveBinary();
     afx_msg void OnClickedButtonLoadBinary();

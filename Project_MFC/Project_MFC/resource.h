@@ -100,6 +100,7 @@
 #define IDC_BUTTON_SAVE_BINARY          1008
 #define IDC_BUTTON_LOAD_BINARY          1009
 #define IDC_EDIT_NAME                   1010
+#define IDC_BUTTON_EXCEL			    1011
 #define ID_OPERATE_INPUTDATA            32771
 #define ID_OPERATE_SAVE_TO_BINARY		32772
 #define ID_OPERATE_LOAD_FROM_BINARY     32773

@@ -270,6 +270,14 @@
     <Image Include="res\Toolbar256.bmp" />
     <Image Include="res\userimages.bmp" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Except1\Except1.vcxproj">
+      <Project>{936cfaf4-3954-4cf6-8c8e-04c78495c51a}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\MyData\MyData.vcxproj">
+      <Project>{c6cc5afc-d18c-4a3e-bb6b-1b127a7ca2ca}</Project>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

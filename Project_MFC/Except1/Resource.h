@@ -5,6 +5,10 @@
 
 // Next default values for new objects
 //
+
+#define IDS_EXCEPTION_TEST            1, "Exception test"
+
+
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 

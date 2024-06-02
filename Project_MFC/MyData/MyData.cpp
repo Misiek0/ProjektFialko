@@ -70,18 +70,10 @@ BOOL CMyDataApp::InitInstance()
 
 MY_POINT* MY_DATA::allocTab(MY_POINT* ptab, int n)
 {
-    try
+    if (!ptab)
     {
-        if (!ptab)
-        {
-            ptab = new MY_POINT[n];
-            capacity = n;
-        }
-    }
-    catch (std::bad_alloc)
-    {
-        //CExcept1App* pExp = (CExcept1App*)pExcept;
-        //pExcept->PutMessage(1003);
+        ptab = new MY_POINT[n];
+        capacity = n;
     }
 
     return ptab;
@@ -89,7 +81,6 @@ MY_POINT* MY_DATA::allocTab(MY_POINT* ptab, int n)
 
 MY_DATA::MY_DATA(int no_it)
 {
-    //pExcept = GetExceptPtr();
     pTab = NULL;
     Init(no_it);
 }
@@ -167,7 +158,6 @@ void MY_DATA::saveToFile(const char* filename)
 
 bool MY_DATA::loadFromFile(const char* filename)
 {
-    try {
         std::ifstream inFile(filename, std::ios::binary);
         if (!inFile)
         {
@@ -199,13 +189,6 @@ bool MY_DATA::loadFromFile(const char* filename)
 
         inFile.close();
         return true;
-    }
-    catch (const std::exception& ex) {
-        //if (pExcept) {
-        //    pExcept->PutMessage((UINT)ex.what());
-        //}
-        return false;
-    }
 }
 
 string MY_DATA::OpenFileDialog()
@@ -260,15 +243,7 @@ void MY_DATA::addObject(const MY_POINT& newPoint) {
         size_t nameLength = strlen(newPoint.name);
         pTab[last].name = new char[nameLength + 1];
 
-        try
-        {
-            //strcpy_s(pTab[last].name, sizeof(pTab[last].name), newPoint.name);
-            strcpy_s(pTab[last].name, nameLength + 1, newPoint.name);
-        }
-        catch (const std::exception&)
-        {
-            int a = 3;
-        }
+        strcpy_s(pTab[last].name, nameLength + 1, newPoint.name);
     }
 
     ++last;
@@ -394,3 +369,57 @@ void MY_DATA::GetMaxMinCoords(double& max_x, double& min_x, double& max_y, doubl
         }
     }
 }
+
+bool MY_DATA::exportToCSV(const char* filename) {
+
+        std::ofstream outFile(filename);
+        if (!outFile) {
+            throw std::runtime_error("Error opening file for writing");
+        }
+
+        // Write header
+        outFile << "x,y,name,numb,color\n";
+
+        // Write data
+        for (int i = 0; i < last; ++i) {
+            outFile << pTab[i].x << ","
+                << pTab[i].y << ","
+                << (pTab[i].name ? pTab[i].name : "") << ","
+                << pTab[i].numb << ","
+                << pTab[i].color << "\n";
+        }
+
+        outFile.close();
+        return true;
+
+}
+
+std::wstring convertToWideString(const char* str) {
+    int size_needed = MultiByteToWideChar(CP_UTF8, 0, str, -1, NULL, 0);
+    std::wstring wstrTo(size_needed, 0);
+    MultiByteToWideChar(CP_UTF8, 0, str, -1, &wstrTo[0], size_needed);
+    return wstrTo;
+}
+
+void MY_DATA::openCSVInExcel(const char* filename) {
+    if (filename == nullptr) {
+        return;
+    }
+
+    // Convert filename to the appropriate string type based on project settings
+#ifdef UNICODE
+    std::wstring wideFilename = convertToWideString(filename);
+    LPCTSTR lpFilename = wideFilename.c_str();
+#else
+    LPCTSTR lpFilename = filename;
+#endif
+
+    // Open the CSV file in Excel
+    HINSTANCE result = ShellExecute(0, 0, _T("excel.exe"), lpFilename, 0, SW_SHOW);
+
+    // Check the result
+    if ((int)result <= 32) {
+        return;
+    }
+}
+
