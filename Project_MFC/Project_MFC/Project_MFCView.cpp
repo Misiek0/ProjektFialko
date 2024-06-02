@@ -141,6 +141,7 @@ void CProjectMFCView::OnDraw(CDC* pDC)
 		newbrush.CreateSolidBrush((*pDoc->pDat)[ipoint].color);
 		oldbrush = pDC->SelectObject(&newbrush);
 		pDC->Ellipse(scr.x + PointRad, scr.y + PointRad, scr.x - PointRad, scr.y - PointRad);
+		//pDC->Ellipse(scr.x + PointRad, scr.y + PointRad, scr.x - PointRad, scr.y - PointRad);
 		pDC->SelectObject(oldbrush);
 		newbrush.DeleteObject();
 
@@ -158,8 +159,15 @@ void CProjectMFCView::OnDraw(CDC* pDC)
 		pDC->SelectObject(oldpen);
 		newpen.DeleteObject();
 
+		char* dupa = (*pDoc->pDat)[ipoint].name;
+
+		CStringA cstrA(dupa); // U¿yj CStringA dla konwersji do ANSI char*
+
+		//CString str;
+		//str.Format(_T("%s %d"), (*pDoc->pDat)[ipoint].name, ipoint);
+		//pDC->TextOut(scr.x + PointRad + 2, scr.y, str);
 		//Output text
-		str.Format("vertex %d", ipoint);
+		str.Format((*pDoc->pDat)[ipoint].name, ipoint);
 		pDC->TextOut(scr.x + PointRad + 2, scr.y, str);
 	}
 

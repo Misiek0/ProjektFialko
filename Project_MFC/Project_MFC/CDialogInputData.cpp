@@ -15,7 +15,7 @@ CDialogInputData::CDialogInputData(CProjectMFCDoc* pDoc, CWnd* pParent /*=nullpt
     , m_X(0)
     , m_Y(0)
     , m_Color(RGB(0, 0, 0))
-    , m_Name(nullptr)
+    , m_Name(_T(""))
     , pDocum(nullptr) // Initialize pDocum to nullptr
     , pDat(nullptr)   // Initialize pDat to nullptr
 {
@@ -46,10 +46,12 @@ CDialogInputData::~CDialogInputData()
 
 void CDialogInputData::DoDataExchange(CDataExchange* pDX)
 {
+    CStringA tempName;
     CDialogEx::DoDataExchange(pDX);
     DDX_Control(pDX, IDC_LIST_CTRL, m_ListCtrl);
     DDX_Text(pDX, IDC_EDIT_X, m_X);
     DDX_Text(pDX, IDC_EDIT_Y, m_Y);
+    DDX_Text(pDX, IDC_EDIT_NAME, m_Name);
 }
 
 BEGIN_MESSAGE_MAP(CDialogInputData, CDialogEx)
@@ -98,12 +100,12 @@ BOOL CDialogInputData::OnInitDialog()
 
     for (int i = 0; i < no_item; i++)
     {
-        MY_POINT pt = (*pDat)[i];
+        //MY_POINT pt = (*pDat)[i];
         lvi.iItem = i;
-        strx.Format("%le", pt.x);
-        stry.Format("%le", pt.y);
-        strColor.Format("%02X%02X%02X", GetRValue(pt.color), GetGValue(pt.color), GetBValue(pt.color)); // Correct RGB order
-        strName = pt.name;
+        strx.Format(_T("%.2f"), (*pDat)[i].x); // strx bêdzie zawieraæ "50.0"
+        stry.Format(_T("%.2f"), (*pDat)[i].y); // stry bêdzie zawieraæ "5.0"
+        strColor.Format("%02X%02X%02X", GetRValue((*pDat)[i].color), GetGValue((*pDat)[i].color), GetBValue((*pDat)[i].color)); // Correct RGB order
+        strName = (*pDat)[i].name;
         lvi.pszText = " ";
         lvi.cchTextMax = (int)(strx.GetLength() + stry.GetLength() + strColor.GetLength());
         m_ListCtrl.InsertItem(&lvi);
@@ -162,8 +164,8 @@ void CDialogInputData::OnClickedButtonAdd()
 {
     UpdateData(TRUE);
     CString strx, stry, strColor, strName;
-    strx.Format("%le", m_X);
-    stry.Format("%le", m_Y);
+    strx.Format(_T("%.2f"), m_X);
+    stry.Format(_T("%.2f"), m_Y);
     strColor.Format("%02X%02X%02X", GetRValue(m_Color), GetGValue(m_Color), GetBValue(m_Color)); // If storing color as text
     strName = m_Name;
 
@@ -188,8 +190,8 @@ void CDialogInputData::OnClickedButtonMod()
 
     UpdateData(TRUE);
     CString strx, stry, strColor, strName;
-    strx.Format("%le", m_X);
-    stry.Format("%le", m_Y);
+    strx.Format(_T("%.2f"), m_X); // strx bêdzie zawieraæ "50.0"
+    stry.Format(_T("%.2f"), m_Y); // stry bêdzie zawieraæ "5.0"
     strColor.Format("%02X%02X%02X", GetRValue(m_Color), GetGValue(m_Color), GetBValue(m_Color)); // Correct RGB order
     strName = m_Name;
 
@@ -232,7 +234,7 @@ void CDialogInputData::OnItemchangingListCtrl(NMHDR* pNMHDR, LRESULT* pResult)
         m_ColorBox.Invalidate();
 
         m_ListCtrl.GetItemText(m_SelItem, 3, st, sizeof(st));
-        m_Name = "XD";
+        m_Name = st;
 
         UpdateData(FALSE);
     }

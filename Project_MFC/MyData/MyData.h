@@ -39,6 +39,7 @@ public:
 
 
 #pragma pack(push, 1)
+class CExcept1App;
 
 class MYDATA_API MY_DATA : public MY_POINT
 {
@@ -46,6 +47,8 @@ protected:
 	MY_POINT* pTab;
 	int capacity;
 	int last;
+public:
+	CExcept1App* pExcept;
 public:
 	MY_DATA(int no_it);
 	MY_DATA(const MY_DATA& ob);

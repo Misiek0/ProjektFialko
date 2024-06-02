@@ -167,36 +167,45 @@ void MY_DATA::saveToFile(const char* filename)
 
 bool MY_DATA::loadFromFile(const char* filename)
 {
-    std::ifstream inFile(filename, std::ios::binary);
-    if (!inFile)
-    {
-        std::cerr << "Error opening file for reading: " << filename << std::endl;
+    try {
+        std::ifstream inFile(filename, std::ios::binary);
+        if (!inFile)
+        {
+            std::cerr << "Error opening file for reading: " << filename << std::endl;
+            return false;
+        }
+
+        clear();
+
+        inFile.read(reinterpret_cast<char*>(&capacity), sizeof(capacity));
+
+        MY_POINT myPointObj;
+
+        for (size_t i = 0; i < capacity; ++i)
+        {
+            inFile.read(reinterpret_cast<char*>(&myPointObj.x), sizeof(myPointObj.x));
+            inFile.read(reinterpret_cast<char*>(&myPointObj.y), sizeof(myPointObj.y));
+            inFile.read(reinterpret_cast<char*>(&myPointObj.numb), sizeof(myPointObj.numb));
+            inFile.read(reinterpret_cast<char*>(&myPointObj.color), sizeof(myPointObj.color));
+
+            size_t nameLength;
+            inFile.read(reinterpret_cast<char*>(&nameLength), sizeof(nameLength));
+            myPointObj.name = new char[nameLength + 1];
+            inFile.read(myPointObj.name, nameLength);
+            myPointObj.name[nameLength] = '\0';
+
+            this->addObject(myPointObj);
+        }
+
+        inFile.close();
+        return true;
+    }
+    catch (const std::exception& ex) {
+        //if (pExcept) {
+        //    pExcept->PutMessage((UINT)ex.what());
+        //}
         return false;
     }
-
-    inFile.read(reinterpret_cast<char*>(&capacity), sizeof(capacity));
-    //delete[] pTab;
-
-    MY_POINT myPointObj;
-
-    for (size_t i = 0; i < capacity; ++i)
-    {
-        inFile.read(reinterpret_cast<char*>(&myPointObj.x), sizeof(myPointObj.x));
-        inFile.read(reinterpret_cast<char*>(&myPointObj.y), sizeof(myPointObj.y));
-        inFile.read(reinterpret_cast<char*>(&myPointObj.numb), sizeof(myPointObj.numb));
-        inFile.read(reinterpret_cast<char*>(&myPointObj.color), sizeof(myPointObj.color));
-
-        size_t nameLength;
-        inFile.read(reinterpret_cast<char*>(&nameLength), sizeof(nameLength));
-        myPointObj.name = new char[nameLength + 1];
-        inFile.read(myPointObj.name, nameLength);
-        myPointObj.name[nameLength] = '\0';
-
-        this->addObject(myPointObj);
-    }
-
-    inFile.close();
-    return true;
 }
 
 string MY_DATA::OpenFileDialog()

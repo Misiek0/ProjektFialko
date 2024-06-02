@@ -52,7 +52,7 @@ public:
 
     double m_X;
     double m_Y;
-    char* m_Name;
+    CString m_Name;
     COLORREF m_Color;
 
     CColorBox m_ColorBox;
